@@ -1,0 +1,157 @@
+<?xml version="1.0"?>
+
+
+<vxml version="2.0">
+
+<!-- document-level link fires a help event -->
+<link event="help">
+<grammar>
+    [dtmf-0 help~0.001]
+</grammar>
+</link>
+
+<!-- document-level link quits -->
+<link event="event.exit">
+<grammar>
+    [quit]
+</grammar>
+</link>
+
+<catch event="event.exit">
+   <exit />
+</catch>
+
+<!-- this form asks the user to choose a department -->
+
+<form id="greeting1">
+    <block>
+      <audio src="foodninja.wav">Welcome to FoodNinja</audio>
+   <audio>Welcome to FoodNinja.  </audio>
+      <goto next="#dept"/>
+    </block>
+  </form>  
+   <!-- dept is the field item variable that 
+        holds the return value from the grammar -->
+  <form id="dept">
+ <field name="dept">      
+      <grammar>
+       <![CDATA[
+       [
+          [dtmf-1 blockheads ([blockheads] ?department) ] {<dept "blockheads">}
+          [dtmf-2 hangawi([most ninjad] ?department) ] {<dept "most hangawi">}
+       ]
+       ]]>
+      </grammar>
+      
+      <prompt>
+         <audio>Here are your saved menus. Press 1 for blockheads. Press 2 for Hangawi. </audio>
+      </prompt>
+
+      <!-- User's utterance didn't match the grammar  -->      
+      <nomatch>
+         <audio>Sorry, I didn't understand</audio>
+         <reprompt/>
+      </nomatch>
+
+      <!-- User was silent -->
+      <noinput>
+         <audio>Sorry, I didn't hear you</audio>
+         <reprompt/>
+      </noinput>
+      
+      <!-- User said help -->
+      <help>
+         <audio>
+            You are in Buy Me. Please choose a department. You can
+            say dogs or plants. You can also say quit at any time.
+         </audio> 
+      </help>
+      
+      <!-- User's utterance matched the grammar -->
+      <filled>
+         <audio>I heard you say <value expr="dept"/></audio>
+
+         <if cond=" dept == 'blockheads' ">
+            <goto next="http://outlawdesign.com/vxml/blockheads.vxml"/>
+         <elseif cond=" dept == 'plant' "/>
+            <goto next="#plant_dept"/>
+         </if>
+      </filled>
+   </field>
+</form>
+
+<!-- 
+   The following two dialogs (dog_dept and plant_dept) don't accept user input.
+   You can make them more useful by allowing the user to choose from a list of items 
+   appropriate for the dialog (aka department).
+-->
+
+<form id="ninjad">
+   <block>
+        <audio>Welcome to foodninja</audio>
+        <!-- TODO: add code to choose a type of dog -->
+        <goto next="#menu_type"/>
+   </block>
+</form>
+<form id="menu_type">
+ <field name="menu_type">      
+      <grammar>
+       <![CDATA[
+       [
+          [dtmf-1 blockheads ([blockheads] ?department) ] {<dept "blockheads">}
+          [dtmf-2 hangawi([hangawi] ?department) ] {<dept "hangawi">}
+       ]
+       ]]>
+      </grammar>
+      
+      <prompt>
+         <audio>Would you like to hear a list of your menus or the most ninja'd menus? Your menus are menus you have saved, most ninja'd menus are the most populary delivery choices for your area.
+You can press 1 for your menus or press 2 for the most ninjad menus.</audio>
+      </prompt>
+
+      <!-- User's utterance didn't match the grammar  -->      
+      <nomatch>
+         <audio>Sorry, I didn't understand</audio>
+         <reprompt/>
+      </nomatch>
+
+      <!-- User was silent -->
+      <noinput>
+         <audio>Sorry, I didn't hear you</audio>
+         <reprompt/>
+      </noinput>
+      
+      <!-- User said help -->
+      <help>
+         <audio>
+            You are in Buy Me. Please choose a department. You can
+            say dogs or plants. You can also say quit at any time.
+         </audio> 
+      </help>
+      
+      <!-- User's utterance matched the grammar -->
+      <filled>
+         <audio>I heard you say <value expr="dept"/></audio>
+
+         <if cond=" dept == 'my_menus' ">
+            <goto next="#my_menus"/>
+         <elseif cond=" dept == 'plant' "/>
+            <goto next="#plant_dept"/>
+         </if>
+      </filled>
+   </field></form>
+<form id="my_menus">
+   <block>
+  <audio src="foodninja.wav">Welcome to FoodNinja</audio>
+        <audio>The following is a list of restaurants that you have Ninjad. </audio>
+  <audio>Press 1 or say Blockheads burrito on 499 third avenue. </audio>
+  <audio>Press 2 or say Hangawi on 12 East 32nd street. </audio>
+  <audio>Press 3 or say Curry in a Hurry at 119 Lexington avenue</audio>
+  <audio>Press 4 or say repeat this menu</audio>
+  <audio>Press 5 or say most ninjad</audio>
+        <!-- TODO: add code to choose a type of plant -->
+        <goto next="#ninjad"/>
+   </block>
+</form>
+
+</vxml>
